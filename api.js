@@ -49,18 +49,22 @@ pool.connect().then(async client => {
 
 
 const TABLES = {
-  usuarios: { name: "usuarios", pk: "id", cols: ["firebase_uid", "nome", "email", "matricula", "role", "fcm_token", "profile_type", "enable_push", "start_time", "end_time", "som_email", "som_push", "enable_email", "recebe_push", "recebe_email", "inicio_nao_perturbe", "fim_nao_perturbe", "foto_url"] },
-  regras: { name: "regras", pk: "id", cols: ["nome", "descricao", "sql", "minuto_atualizacao", "active", "hora_inicio", "hora_final", "qtd_erro_max", "roles", "email_notificacao", "prioridade", "role_target", "banco_alvo", "usuario_id"] },
-  escalas: { name: "escalas", pk: "id", cols: ["id_usuario", "data_inicio", "data_fim", "canal"] },
+  usuarios: { name: "usuarios", pk: "id", cols: ["firebase_uid", "nome", "email", "matricula", "role", "recebe_push", "recebe_email", "som_push", "som_email", "start_time", "end_time", "inicio_nao_perturbe", "fim_nao_perturbe", "foto_url", "profile_type"] },
+  regras: { name: "regras", pk: "id", cols: ["nome", "descricao", "sql", "active", "minuto_atualizacao", "hora_inicio", "hora_final", "banco_alvo", "qtd_erro_max", "prioridade", "usuario_id", "role_target", "email_notificacao", "roles", "silenciado_ate"] },
+  escalas: { name: "escalas", pk: "id", cols: ["id_usuario", "id_usuario_original", "canal", "data_inicio", "data_fim", "status_confirmacao"] },
   permissoes: { name: "permissoes", pk: "id", cols: ["codigo", "descricao"] },
+  permissoes_roles: { name: "permissoes_roles", pk: "id", cols: ["role", "permissao_id", "ativo"] },
   permissoes_usuarios: { name: "permissoes_usuarios", pk: "id", cols: ["usuario_id", "permissao_id", "ativo", "is_customizado"] },
-  incidentes: { name: "incidentes", pk: "id_incidente", cols: ["id_regra", "data_abertura", "status", "prioridade", "detalhes", "id_execucao_origem", "data_ultima_ocorrencia", "comentario_resolucao"] },
-  notificacoes: { name: "notificacoes", pk: "id", cols: ["id_incidente", "canal", "destinatario", "mensagem", "status", "titulo", "metadados"] },
-  dispositivos_usuarios: { name: "dispositivos_usuarios", pk: "id", cols: ["id_usuario", "push_token", "tipo_dispositivo", "ultimo_acesso", "ativo"] },
-  eventos_incidente: { name: "eventos_incidente", pk: "id", cols: ["id_incidente", "tipo", "usuario", "detalhes"] },
-  logs: { name: "logs_auditoria", pk: "id", cols: ["responsavel", "acao", "alvo", "detalhes", "timestamp"] },
   usuarios_roles: { name: "usuarios_roles", pk: "id", cols: ["id_usuario", "role_name"] },
-  fila_runner: { name: "fila_runner", pk: "id", cols: ["id_regra", "status", "agendado_para"] }
+  execucoes_regras: { name: "execucoes_regras", pk: "id_execucao", cols: ["id_regra", "data_inicio", "data_fim", "sucesso", "resultado_json", "linhas_afetadas", "erro_mensagem", "valor_retornado"] },
+  incidentes: { name: "incidentes", pk: "id_incidente", cols: ["id_regra", "status", "prioridade", "detalhes", "comentario_resolucao", "data_abertura", "data_ultima_ocorrencia", "id_execucao_origem"] },
+  eventos_incidente: { name: "eventos_incidente", pk: "id", cols: ["id_incidente", "tipo", "usuario", "detalhes", "timestamp"] },
+  fila_runner: { name: "fila_runner", pk: "id", cols: ["id_regra", "status", "agendado_para"] },
+  dispositivos_usuarios: { name: "dispositivos_usuarios", pk: "id", cols: ["id_usuario", "push_token", "tipo_dispositivo", "ultimo_acesso", "ativo"] },
+  notificacoes: { name: "notificacoes", pk: "id", cols: ["id_usuario", "id_incidente", "canal", "destinatario", "titulo", "mensagem", "status", "lida", "metadados"] },
+  logs: { name: "logs_auditoria", pk: "id", cols: ["responsavel", "acao", "alvo", "detalhes", "timestamp"] },
+  sistema_status: { name: "sistema_status", pk: "id", cols: ["servico", "ultimo_batimento", "status"] },
+  metricas_diarias: { name: "metricas_diarias", pk: "id", cols: ["data_referencia", "id_regra", "total_execucoes", "total_erros", "tempo_medio_execucao_ms", "incidentes_abertos", "mttr_minutos", "mtta_minutos", "updated_at"] }
 };
 
 app.get('/notificacoes/pendentes', async (req, res) => {
